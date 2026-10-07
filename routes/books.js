@@ -9,61 +9,59 @@ const {
 const PREFIX = "289";
 const VAT = 13;
 
-// READ -> bắt buộc sử dụng tài khoản READ
+// READ -> sử dụng tài khoản READ
 router.get("/books", async (req, res) => {
     try {
         const books = await ReadBook.find().lean();
 
-        res.json({
-            account: "23IT289_read",
-            books
+        res.render("books", {
+            books: books
         });
+
     } catch (error) {
-        res.status(500).json({
-            error: error.message
-        });
+        res.status(500).send(error.message);
     }
 });
 
-// WRITE -> bắt buộc sử dụng tài khoản WRITE
+// WRITE -> sử dụng tài khoản WRITE
 router.post("/books", async (req, res) => {
     try {
         const { productCode, name, price } = req.body;
 
+        // Kiểm tra mã sản phẩm
         if (!productCode || !productCode.startsWith(PREFIX)) {
-            return res.status(400).json({
-                error: "Mã sản phẩm bắt buộc phải bắt đầu bằng 289"
-            });
+            return res.status(400).send(
+                "Mã sản phẩm bắt buộc phải bắt đầu bằng 289"
+            );
         }
 
         const originalPrice = Number(price);
 
+        // Kiểm tra giá
         if (!Number.isFinite(originalPrice) || originalPrice < 0) {
-            return res.status(400).json({
-                error: "Giá sản phẩm không hợp lệ"
-            });
+            return res.status(400).send(
+                "Giá sản phẩm không hợp lệ"
+            );
         }
 
-        const priceAfterVAT =
-            Math.round(originalPrice * (1 + VAT / 100));
+        // Tính VAT 13%
+        const priceAfterVAT = Math.round(
+            originalPrice * (1 + VAT / 100)
+        );
 
-        const book = await WriteBook.create({
+        // Ghi bằng WRITE account
+        await WriteBook.create({
             productCode,
             name,
             price: originalPrice,
             priceAfterVAT
         });
 
-        res.status(201).json({
-            account: "23IT289_write",
-            vat: "13%",
-            book
-        });
+        // Quay lại danh sách sách
+        res.redirect("/books");
 
     } catch (error) {
-        res.status(500).json({
-            error: error.message
-        });
+        res.status(500).send(error.message);
     }
 });
 

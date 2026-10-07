@@ -1,0 +1,45 @@
+<h1>Book Manager</h1>
+
+<h2>Add Book</h2>
+
+<form action="/books" method="POST">
+    <div>
+        <label>Product Code:</label>
+        <input type="text" name="productCode" required>
+    </div>
+
+    <div>
+        <label>Book Name:</label>
+        <input type="text" name="name" required>
+    </div>
+
+    <div>
+        <label>Price:</label>
+        <input type="number" name="price" required>
+    </div>
+
+    <button type="submit">Add Book</button>
+</form>
+
+<hr>
+
+<h2>Book List</h2>
+
+<table border="1" cellpadding="10">
+    <tr>
+        <th>Product Code</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Price After VAT</th>
+    </tr>
+
+    {{#each books}}
+    <tr>
+        <td>{{productCode}}</td>
+        <td>{{name}}</td>
+        <td>{{price}}</td>
+        <td>{{priceAfterVAT}}</td>
+    </tr>
+    {{/each}}
+
+</table>
